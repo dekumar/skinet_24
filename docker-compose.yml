@@ -1,0 +1,9 @@
+services:
+  mssql:
+    image: mcr.microsoft.com/mssql/server:2022-latest # image name to fetch from docekr repos
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "Password@1" # password for the System Admin Account in mssql
+    # plateform: "windows/amd64" not needed for windows intel chip set
+    ports:
+      - "1433:1433"
