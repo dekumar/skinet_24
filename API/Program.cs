@@ -1,3 +1,4 @@
+using Core.Interfaces;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
@@ -6,7 +7,7 @@ namespace API;
 
 public class Program
 {
-    public static void Main(string[] args)
+    public static async Task Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +19,8 @@ public class Program
         {
             opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
         });
+        
+        builder.Services.AddScoped<IProductRepository, ProductRepository>();
 
         var app = builder.Build();
 
@@ -33,6 +36,21 @@ public class Program
             app.MapScalarApiReference();
         }
         app.MapControllers();
+
+        try
+        {
+            using var scope = app.Services.CreateScope();
+            var services = scope.ServiceProvider;
+            var context=services.GetRequiredService<StoreContext>();
+            await context.Database.MigrateAsync();
+            await StoreContextSeed.SeedAsync(context);
+        }
+        catch (Exception Ex)
+        {            
+            System.Console.WriteLine(Ex);
+            throw;
+        }
+
         app.Run();
     }
 }
