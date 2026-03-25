@@ -6,20 +6,26 @@ namespace Core.Specifications;
 
 public class ProductSpecification : BaseSpecification<Product>
 {
-    public ProductSpecification(string? brand, string? type, string? sort) : base(p =>
-        (string.IsNullOrEmpty(brand) || p.Brand == brand) && (string.IsNullOrEmpty(type) || p.Type == type)
+    public ProductSpecification(ProdSpecParamCls prodSpecParamClassObj) :
+        base(p =>
+            (string.IsNullOrEmpty(prodSpecParamClassObj.Search) || p.Name.ToLower().Contains(prodSpecParamClassObj.Search))
+            && (!prodSpecParamClassObj.Brands.Any() || prodSpecParamClassObj.Brands.Contains(p.Brand))
+            && (!prodSpecParamClassObj.Types.Any() || prodSpecParamClassObj.Types.Contains(p.Type))
     )
     {
-        switch (sort)
+
+        ApplyPaging(prodSpecParamClassObj.PageSize * (prodSpecParamClassObj.PageIndex - 1), prodSpecParamClassObj.PageSize);
+
+        switch (prodSpecParamClassObj.Sort)
         {
             case "priceAsc":
-                AddOrderBy(x=>x.Price);
+                AddOrderBy(x => x.Price);
                 break;
             case "priceDesc":
-                AddOrderByDescending(x=>x.Price);
+                AddOrderByDescending(x => x.Price);
                 break;
             default:
-                AddOrderBy(x=>x.Name);
+                AddOrderBy(x => x.Name);
                 break;
         }
     }
