@@ -41,7 +41,7 @@ namespace API.Controllers
                 return CreatedAtAction("GetProduct", new { id = product.Id }, product);
             }
 
-            return BadRequest("Problem Creatign Product");
+            return BadRequest("Problem Creating Product");
         }
 
         [HttpPut("{id:int}")]
